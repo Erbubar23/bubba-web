@@ -1,0 +1,100 @@
+/* Custom styling & animations for Erbubar23 Portfolio */
+
+/* Skill Tag styling */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+  border-color: #38bdf8;
+  color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+/* Filter pills */
+.filter-pill {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  background: rgba(15, 23, 42, 0.6);
+  color: #94a3b8;
+}
+
+.filter-pill:hover {
+  background: rgba(30, 41, 59, 0.8);
+  color: #f1f5f9;
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.filter-pill.active {
+  background: #10b981 !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+}
+
+/* Project Card Hover & Border Effects */
+.project-card {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%);
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.15);
+}
+
+/* Card Glow Effect */
+.card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.8), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card:hover .card-glow {
+  opacity: 1;
+}
+
+/* Smooth custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Rotating animation for refresh icon */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
