@@ -1,68 +1,148 @@
-/* Custom styling & animations for Erbubar23 Portfolio */
+/* ==========================================================================
+   NEW WAVE & SYNTH AESTHETIC STYLESHEET
+   Erick Buendia (@Erbubar23)
+   ========================================================================== */
 
-/* Skill Tag styling */
-.skill-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.6rem;
-  background-color: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  border-radius: 9999px;
-  font-size: 0.7rem;
-  font-family: 'JetBrains Mono', monospace;
-  color: #94a3b8;
-  transition: all 0.2s ease;
+/* 1. RETRO GRID BACKGROUND */
+.retro-grid {
+  background-color: #080512;
+  background-image: 
+    linear-gradient(to right, rgba(255, 0, 127, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-.skill-tag:hover {
-  border-color: #38bdf8;
-  color: #f8fafc;
-  transform: translateY(-1px);
+/* 2. PERSPECTIVE 3D HORIZON GRID (Synthwave / New Wave visual floor) */
+.perspective-grid-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  perspective: 450px;
+  opacity: 0.35;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 10%, transparent 95%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 10%, transparent 95%);
 }
 
-/* Filter pills */
+.perspective-grid-plane {
+  position: absolute;
+  top: -20%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    linear-gradient(to right, rgba(255, 0, 127, 0.25) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.25) 2px, transparent 2px);
+  background-size: 60px 60px;
+  transform: rotateX(65deg);
+  animation: grid-scroll 18s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes grid-scroll {
+  0% {
+    transform: rotateX(65deg) translateY(0);
+  }
+  100% {
+    transform: rotateX(65deg) translateY(60px);
+  }
+}
+
+/* 3. CRT SCANLINE EFFECT */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 26, 0) 50%, 
+    rgba(0, 0, 0, 0.35) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* 4. NEON GLOW TEXT */
+.neon-text-pink {
+  text-shadow: 
+    0 0 10px rgba(255, 0, 127, 0.7),
+    0 0 25px rgba(255, 0, 127, 0.4),
+    0 0 40px rgba(255, 0, 127, 0.2);
+}
+
+.neon-text-cyan {
+  text-shadow: 
+    0 0 10px rgba(0, 240, 255, 0.7),
+    0 0 25px rgba(0, 240, 255, 0.4);
+}
+
+/* 5. SYNTH VU-METER BARS */
+.vu-bar {
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: #3b236e;
+  animation: vu-jump 1.2s ease-in-out infinite alternate;
+}
+
+.vu-1 { animation-delay: 0.1s; background: #00f0ff; }
+.vu-2 { animation-delay: 0.4s; background: #39ff14; }
+.vu-3 { animation-delay: 0.2s; background: #ffe600; }
+.vu-4 { animation-delay: 0.5s; background: #ff007f; }
+.vu-5 { animation-delay: 0.3s; background: #ff2a85; }
+.vu-6 { animation-delay: 0.6s; background: #ff007f; }
+
+@keyframes vu-jump {
+  0% { transform: scaleY(0.2); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.4); opacity: 0.7; }
+}
+
+/* 6. FILTER PILLS */
 .filter-pill {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(51, 65, 85, 0.5);
-  background: rgba(15, 23, 42, 0.6);
-  color: #94a3b8;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(138, 43, 226, 0.35);
+  background: rgba(15, 10, 33, 0.8);
+  color: #c4b5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .filter-pill:hover {
-  background: rgba(30, 41, 59, 0.8);
-  color: #f1f5f9;
-  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(35, 20, 70, 0.9);
+  color: #ffffff;
+  border-color: rgba(255, 0, 127, 0.6);
+  box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
 }
 
 .filter-pill.active {
-  background: #10b981 !important;
-  color: #000000 !important;
-  font-weight: 600 !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, #ff007f, #7000ff) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-color: #ff007f !important;
+  box-shadow: 0 0 16px rgba(255, 0, 127, 0.5);
 }
 
-/* Project Card Hover & Border Effects */
+/* 7. PROJECT CARDS (Synth Console Aesthetic) */
 .project-card {
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   position: relative;
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(15, 10, 33, 0.95) 0%, rgba(20, 12, 45, 0.9) 100%);
+  border: 1px solid #2d1b54;
+  transition: all 0.28s ease;
 }
 
 .project-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(52, 211, 153, 0.4);
-  box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.15);
+  transform: translateY(-5px);
+  border-color: rgba(255, 0, 127, 0.6);
+  box-shadow: 
+    0 15px 35px -10px rgba(255, 0, 127, 0.25),
+    0 0 15px rgba(0, 240, 255, 0.15);
 }
 
-/* Card Glow Effect */
 .card-glow {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.8), transparent);
+  background: linear-gradient(90deg, #ff007f, #7000ff, #00f0ff);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -71,25 +151,59 @@
   opacity: 1;
 }
 
-/* Smooth custom scrollbar */
+/* 8. SKILL & RACK TAGS */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  background-color: rgba(22, 12, 51, 0.85);
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #e2d9f3;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 9. RACK UNIT HOVER */
+.rack-unit {
+  transition: all 0.25s ease;
+}
+
+.rack-unit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(112, 0, 255, 0.3);
+}
+
+/* 10. SCROLLBAR */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 9px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0d14;
+  background: #080512;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #2d1b54;
   border-radius: 4px;
+  border: 1px solid rgba(255, 0, 127, 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #ff007f;
+  box-shadow: 0 0 10px #ff007f;
 }
 
-/* Rotating animation for refresh icon */
+/* 11. REFRESH ROTATION */
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

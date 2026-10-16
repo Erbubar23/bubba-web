@@ -1,30 +1,28 @@
 /**
- * Dynamic GitHub Portfolio Integration
+ * Dynamic GitHub Portfolio Integration - New Wave Edition
  * Erick Buendia (@Erbubar23)
  * Fetches real-time repositories and user stats directly from GitHub REST API
  */
 
 const GITHUB_USERNAME = 'Erbubar23';
-const CACHE_KEY = `gh_cache_${GITHUB_USERNAME}_repos`;
-const USER_CACHE_KEY = `gh_cache_${GITHUB_USERNAME}_user`;
-const CACHE_TIME_KEY = `gh_cache_${GITHUB_USERNAME}_time`;
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache to prevent rate-limits
+const CACHE_KEY = `gh_cache_${GITHUB_USERNAME}_repos_v2`;
+const USER_CACHE_KEY = `gh_cache_${GITHUB_USERNAME}_user_v2`;
+const CACHE_TIME_KEY = `gh_cache_${GITHUB_USERNAME}_time_v2`;
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache to avoid rate limits
 
-// GitHub language colors mapping
+// New Wave neon colors for languages
 const LANGUAGE_COLORS = {
-  'C++': '#f34b7d',
-  'C': '#555555',
-  'Python': '#3572A5',
-  'JavaScript': '#f1e05a',
-  'TypeScript': '#3178c6',
-  'HTML': '#e34c26',
-  'CSS': '#563d7c',
-  'Shell': '#89e051',
-  'Assembly': '#6E4C13',
-  'Rust': '#dea584',
-  'Go': '#00ADD8',
-  'Java': '#b07219',
-  'C#': '#178600'
+  'C++': '#ff007f',      // Neon Magenta
+  'C': '#00f0ff',        // Electric Cyan
+  'Python': '#ffe600',   // Acid Yellow
+  'JavaScript': '#39ff14', // Neon Lime
+  'TypeScript': '#00d4ff', // Cyan Glow
+  'HTML': '#ff7700',     // Neon Orange
+  'CSS': '#c77dff',      // Neon Lilac
+  'Shell': '#ff0055',    // Laser Red
+  'Assembly': '#e0aaff', // Violet
+  'Rust': '#ff5400',     // Fire Orange
+  'Go': '#00f5d4'        // Mint Teal
 };
 
 // State
@@ -62,19 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
-  // Search
   searchInput.addEventListener('input', (e) => {
     currentSearchTerm = e.target.value.toLowerCase().trim();
     renderFilteredProjects();
   });
 
-  // Sort
   sortSelect.addEventListener('change', (e) => {
     currentSortOrder = e.target.value;
     renderFilteredProjects();
   });
 
-  // Refresh
   btnRefresh.addEventListener('click', () => {
     refreshIcon.classList.add('spinning');
     loadData(true).finally(() => {
@@ -132,14 +127,13 @@ async function loadData(force = false) {
       return;
     }
 
-    // Fetch up to 100 repositories, sorted by recently updated
     const response = await fetch(
       `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`
     );
 
     if (!response.ok) {
       if (response.status === 403 && cachedRepos) {
-        console.warn('GitHub rate limit reached, using cached repositories.');
+        console.warn('GitHub rate limit reached, using cached data.');
         allRepositories = JSON.parse(cachedRepos);
         processRepositories(allRepositories);
         return;
@@ -148,12 +142,8 @@ async function loadData(force = false) {
     }
 
     const repos = await response.json();
-    
-    // Filter out user's profile repository (if it is just Erbubar23/Erbubar23) from the projects grid if desired,
-    // or keep it if it contains useful content. We'll show all public repos.
     allRepositories = repos;
 
-    // Cache results
     localStorage.setItem(CACHE_KEY, JSON.stringify(repos));
     localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
 
@@ -161,10 +151,10 @@ async function loadData(force = false) {
   } catch (error) {
     console.error('Error loading GitHub repositories:', error);
     projectsGrid.innerHTML = `
-      <div class="col-span-full p-8 text-center bg-slate-900/60 rounded-2xl border border-red-500/20 text-slate-300">
-        <i data-lucide="alert-triangle" class="w-10 h-10 text-amber-400 mx-auto mb-2"></i>
-        <p class="font-semibold">No se pudieron cargar los repositorios en este momento.</p>
-        <p class="text-xs text-slate-400 mt-1">Revisa tu conexión o intenta nuevamente haciendo clic en Actualizar.</p>
+      <div class="col-span-full p-8 text-center bg-[#0f0a21] rounded-2xl border border-pink-500/30 text-slate-300">
+        <i data-lucide="radio" class="w-10 h-10 text-pink-500 mx-auto mb-2 animate-pulse"></i>
+        <p class="font-bold font-display uppercase tracking-wider text-pink-400">Interferencia de señal en la API</p>
+        <p class="text-xs text-slate-400 mt-1 font-mono">No se pudieron cargar los datos en este momento. Intenta pulsar FETCH_LATEST.</p>
       </div>
     `;
     if (window.lucide) lucide.createIcons();
@@ -175,7 +165,6 @@ async function loadData(force = false) {
  * Process repos, update stats, and build filters
  */
 function processRepositories(repos) {
-  // Compute global stats
   const totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
   const totalForks = repos.reduce((sum, r) => sum + (r.forks_count || 0), 0);
 
@@ -192,7 +181,6 @@ function processRepositories(repos) {
  * Build dynamic language filter buttons based on actual repositories
  */
 function buildLanguageFilters(repos) {
-  // Count frequency of each language
   const languageCounts = {};
   repos.forEach(repo => {
     if (repo.language) {
@@ -200,21 +188,20 @@ function buildLanguageFilters(repos) {
     }
   });
 
-  // Remove existing dynamic buttons (keep "Todos")
   const dynamicButtons = languageFiltersContainer.querySelectorAll('.dynamic-filter');
   dynamicButtons.forEach(btn => btn.remove());
 
-  // Sort languages by count
   const sortedLanguages = Object.entries(languageCounts).sort((a, b) => b[1] - a[1]);
 
   sortedLanguages.forEach(([lang, count]) => {
     const btn = document.createElement('button');
-    btn.className = `filter-pill dynamic-filter px-3 py-1 rounded-full text-xs font-medium ${
+    btn.className = `filter-pill dynamic-filter px-3.5 py-1 rounded-full text-xs font-mono font-medium ${
       activeLanguageFilter === lang ? 'active' : ''
     }`;
     btn.dataset.filter = lang;
+    const color = LANGUAGE_COLORS[lang] || '#00f0ff';
     btn.innerHTML = `
-      <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${LANGUAGE_COLORS[lang] || '#8b949e'}"></span>
+      <span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background-color: ${color}; box-shadow: 0 0 6px ${color};"></span>
       ${lang} (${count})
     `;
 
@@ -225,7 +212,6 @@ function buildLanguageFilters(repos) {
     languageFiltersContainer.appendChild(btn);
   });
 
-  // Attach listener to "Todos" button
   const allBtn = languageFiltersContainer.querySelector('[data-filter="all"]');
   if (allBtn) {
     allBtn.onclick = () => setLanguageFilter('all');
@@ -235,7 +221,6 @@ function buildLanguageFilters(repos) {
 function setLanguageFilter(lang) {
   activeLanguageFilter = lang;
   
-  // Update active pill classes
   const pills = languageFiltersContainer.querySelectorAll('.filter-pill');
   pills.forEach(pill => {
     if (pill.dataset.filter === lang) {
@@ -259,7 +244,7 @@ function renderFilteredProjects() {
     filtered = filtered.filter(repo => repo.language === activeLanguageFilter);
   }
 
-  // Search filter (searches name, description, and topics)
+  // Search filter
   if (currentSearchTerm) {
     filtered = filtered.filter(repo => {
       const name = (repo.name || '').toLowerCase();
@@ -289,7 +274,6 @@ function renderFilteredProjects() {
     }
   });
 
-  // Render cards or empty state
   if (filtered.length === 0) {
     projectsGrid.innerHTML = '';
     emptyState.classList.remove('hidden');
@@ -305,57 +289,57 @@ function renderFilteredProjects() {
 }
 
 /**
- * Generate HTML for an individual project card
+ * Generate HTML for an individual project card with New Wave style
  */
 function createProjectCardHTML(repo) {
-  const langColor = LANGUAGE_COLORS[repo.language] || '#94a3b8';
+  const langColor = LANGUAGE_COLORS[repo.language] || '#00f0ff';
   const updatedAgo = formatRelativeTime(repo.pushed_at || repo.updated_at);
-  const description = repo.description || 'Sin descripción detallada por el momento.';
+  const description = repo.description || 'Sin descripción detallada disponible en el repositorio.';
   const topics = repo.topics || [];
 
   return `
-    <article class="project-card rounded-2xl border border-slate-800 p-5 flex flex-col justify-between overflow-hidden group">
+    <article class="project-card rounded-2xl p-5 flex flex-col justify-between overflow-hidden group">
       <div class="card-glow"></div>
 
       <div>
-        <!-- Card Header: Title & Badges -->
+        <!-- Card Header: Title & Indicators -->
         <div class="flex items-start justify-between gap-3 mb-2.5">
-          <h3 class="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors tracking-tight line-clamp-1">
-            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="hover:underline flex items-center gap-1.5">
-              <i data-lucide="folder-git-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+          <h3 class="font-display font-bold text-lg text-white group-hover:text-pink-400 transition-colors tracking-wide line-clamp-1">
+            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="hover:underline flex items-center gap-2">
+              <i data-lucide="disc" class="w-4 h-4 text-pink-500 shrink-0"></i>
               <span>${escapeHTML(repo.name)}</span>
             </a>
           </h3>
 
           <div class="flex items-center gap-1.5 shrink-0">
             ${repo.fork ? `
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">
-                Fork
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
+                FORK
               </span>
             ` : ''}
             ${repo.archived ? `
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400">
-                Archivado
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-800">
+                ARCHIVED
               </span>
             ` : ''}
           </div>
         </div>
 
         <!-- Description -->
-        <p class="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-3 font-normal">
           ${escapeHTML(description)}
         </p>
 
-        <!-- Topics / Tags -->
+        <!-- Topics / Synthesizer Tags -->
         ${topics.length > 0 ? `
           <div class="flex flex-wrap gap-1.5 mb-4">
             ${topics.slice(0, 4).map(topic => `
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 border border-slate-700/50">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#180e38] text-pink-300 border border-pink-500/30">
                 #${escapeHTML(topic)}
               </span>
             `).join('')}
             ${topics.length > 4 ? `
-              <span class="text-[10px] font-mono px-1.5 py-0.5 text-slate-500">
+              <span class="text-[10px] font-mono px-1.5 py-0.5 text-purple-400">
                 +${topics.length - 4}
               </span>
             ` : ''}
@@ -364,24 +348,24 @@ function createProjectCardHTML(repo) {
       </div>
 
       <!-- Card Footer: Meta Info & Actions -->
-      <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400 mt-2">
+      <div class="pt-4 border-t border-[#2d1b54] flex items-center justify-between text-xs font-mono text-slate-400 mt-2">
         <div class="flex items-center gap-3">
           ${repo.language ? `
-            <span class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${langColor};"></span>
+            <span class="flex items-center gap-1.5 text-slate-200">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${langColor}; box-shadow: 0 0 6px ${langColor};"></span>
               ${repo.language}
             </span>
-          ` : '<span class="text-slate-500">Docs/Otro</span>'}
+          ` : '<span class="text-purple-400">Audio/Docs</span>'}
 
           ${repo.stargazers_count > 0 ? `
-            <span class="flex items-center gap-1 hover:text-amber-300 transition-colors">
-              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span class="flex items-center gap-1 text-yellow-300">
+              <i data-lucide="star" class="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/20"></i>
               ${repo.stargazers_count}
             </span>
           ` : ''}
 
           ${repo.forks_count > 0 ? `
-            <span class="flex items-center gap-1 hover:text-cyan-300 transition-colors">
+            <span class="flex items-center gap-1 text-cyan-300">
               <i data-lucide="git-fork" class="w-3.5 h-3.5 text-cyan-400"></i>
               ${repo.forks_count}
             </span>
@@ -390,11 +374,11 @@ function createProjectCardHTML(repo) {
 
         <div class="flex items-center gap-2">
           ${repo.homepage ? `
-            <a href="${repo.homepage}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-all" title="Ver Demo / Web">
+            <a href="${repo.homepage}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 transition-all shadow-[0_0_8px_rgba(255,0,127,0.2)]" title="Lanzar Web / Demo">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
             </a>
           ` : ''}
-          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors" title="Ver repositorio en GitHub">
+          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-[#160c33] hover:bg-[#231452] text-cyan-300 border border-[#3b236e] hover:border-cyan-400/60 transition-colors" title="Ver código en GitHub">
             <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
           </a>
         </div>
@@ -404,7 +388,7 @@ function createProjectCardHTML(repo) {
 }
 
 /**
- * Format timestamp into Spanish relative time
+ * Format relative time in Spanish
  */
 function formatRelativeTime(dateString) {
   if (!dateString) return '';
@@ -412,13 +396,13 @@ function formatRelativeTime(dateString) {
   const now = new Date();
   const diffInSeconds = Math.floor((now - date) / 1000);
 
-  if (diffInSeconds < 60) return 'hace un momento';
+  if (diffInSeconds < 60) return 'hace instantes';
   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) return `hace ${diffInMinutes} m`;
+  if (diffInMinutes < 60) return `hace ${diffInMinutes}m`;
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `hace ${diffInHours} h`;
+  if (diffInHours < 24) return `hace ${diffInHours}h`;
   const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 30) return `hace ${diffInDays} d`;
+  if (diffInDays < 30) return `hace ${diffInDays}d`;
   const diffInMonths = Math.floor(diffInDays / 30);
   if (diffInMonths < 12) return `hace ${diffInMonths} mes${diffInMonths > 1 ? 'es' : ''}`;
   return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
